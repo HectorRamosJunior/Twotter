@@ -34,6 +34,16 @@ class TwotterProfileForm(forms.ModelForm):
         }
 
 
+class SettingsForm(forms.ModelForm):
+  class Meta:
+        model = TwotterProfile 
+        fields = ('display_name', 'description', 'location', 'birthday', 'avatar_url',)
+        widgets = {
+            'description': forms.Textarea(
+                attrs={'style': 'width:100%;', 'rows':'3',}
+            ),
+        }
+
 class TwootForm(forms.ModelForm):
   class Meta:
     model = Twoot

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
 from django.contrib.auth import authenticate, login, logout
@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from .models import TwotterProfile, Twoot
-from .forms import UserForm, TwotterProfileForm, TwootForm
+from .forms import UserForm, TwotterProfileForm, TwootForm, SettingsForm
 
 import json
 
@@ -14,34 +14,68 @@ import json
 # Create your views here.
 def index(request):
     if request.user.is_authenticated():
+        # Creates a Twotter Profile if the current user came from another app
+        create_profile_for_user(str(request.user.username))
+
         twotter_profile = User.objects.get(username=request.user.username).twotter_profile
-        twoots = Twoot.objects.all().order_by('-creation_date')
     else:
         twotter_profile = None
-        twoots = Twoot.objects.all()
 
+    twoots = Twoot.objects.all().order_by('-creation_date')
     context = {'twotter_profile': twotter_profile, 'twoots': twoots}
 
     return render(request, 'twotter/index.html', context)
 
-def redirect_to_index(request):
-    return redirect('/twotter/')
-
 def twotter_profile(request, username):
-    return redirect('/twotter/')
+    twotter_profile = get_object_or_404(User, username=username).twotter_profile
+    twoots = twotter_profile.twoots.all().order_by('-creation_date')
+
+    context = {'twotter_profile': twotter_profile, 'twoots': twoots}
+
+    return render(request, 'twotter/profile.html', context)
+
+@login_required
+def profile_settings(request):
+    twotter_profile = get_object_or_404(User, username=request.user.username).twotter_profile
+    saved = False
+
+    if request.method == "POST":
+        if request.POST["button"] == "Settings":
+            settings_form = SettingsForm(instance=twotter_profile, data=request.POST)
+
+            if settings_form.is_valid():
+                twotter_profile = settings_form.save()
+                saved = True
+    elif request.method == "GET":
+        settings_form = SettingsForm(instance=twotter_profile)
+
+    context = {'twotter_profile': twotter_profile, 'settings_form': settings_form, 'saved': saved}
+
+    return render(request, 'twotter/settings.html', context)
 
 @login_required
 def make_twoot(request):
     if request.method == "POST":
-        print "Here's the text", request.POST.get("twoot_text")
+        print "Twoot text received: "
+        print request.POST.get("twoot_text")
         twoot_form = TwootForm({"text": request.POST.get("twoot_text")})
 
         if twoot_form.is_valid():
+            twotter_profile = request.user.twotter_profile
+            twotter_profile.twoot_count += 1
+            twotter_profile.save()
+
             twoot = twoot_form.save(commit=False)
-            twoot.twotter_profile = request.user.twotter_profile
+            twoot.twotter_profile = twotter_profile
             twoot.save()
 
-            return HttpResponse(json.dumps(""), content_type="application/json")
+            response_data = {}
+            response_data["avatar_url"] = twotter_profile.avatar_url
+            response_data["creation_date"] = twoot.creation_date.isoformat()
+            response_data["display_name"] = twotter_profile.display_name
+            response_data["text"] = twoot.text
+
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             print twoot_form.errors
     else:
@@ -115,3 +149,27 @@ def user_logout(request):
     logout(request)
 
     return redirect('twotter/')
+
+def redirect_to_index(request):
+    return redirect('/twotter/')
+
+# Function that creates the profile for the user if they created an acc
+# From another app on this project
+def create_profile_for_user(username):
+  try:
+    user = User.objects.get(username=username)
+  except:
+    user = None
+
+  try:
+    profile = TwotterProfile.objects.get(user__username=username)
+  except:
+    profile = None
+
+  # Handle if the user exists in the project but not in this app
+  if user and not profile and username != "admin":
+    profile = TwotterProfile()
+    profile.user = User.objects.get(username=username)
+    profile.display_name = username
+
+    profile.save()

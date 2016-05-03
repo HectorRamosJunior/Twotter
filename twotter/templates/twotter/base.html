@@ -5,10 +5,10 @@
 <head>
   <title>{% block title %}{% endblock title %}</title>    
   <meta charset="utf-8">
-  <link rel="stylesheet" href="{% static "twotter/style.css" %}" />
+  <link rel="stylesheet" href="{% static 'twotter/style.css' %}">
   <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script type="text/javascript" src="{% static "twotter/script.js" %}" charset="UTF-8"></script>
+  <script type="text/javascript" src="{% static 'twotter/script.js' %}" charset="UTF-8"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
   <link rel="stylesheet" href="http://www.w3schools.com/lib/w3-theme-blue.css">
@@ -26,9 +26,9 @@
     <li class="w3-hide-medium w3-hide-large w3-opennav w3-right">
       <a class="w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
     </li>
-    <li><a href="#" class="w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a></li>
+    <li><a href="{{ request.host_name }}/twotter/" class="w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Twotter Feed</a></li>
   {% if user.is_authenticated %}
-    <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Account Settings"><i class="fa fa-user"></i></a></li>
+    <li class="w3-hide-small"><a href="{{ request.host_name }}/twotter/settings/" class="w3-padding-large w3-hover-white" title="Account Settings"><i class="fa fa-user"></i></a></li>
     <li class="w3-hide-small"><a href="#" class="w3-padding-large w3-hover-white" title="Messages"><i class="fa fa-envelope"></i></a></li>
     <li class="w3-hide-small w3-dropdown-hover">
       <a href="#" class="w3-padding-large w3-hover-white" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green">
@@ -36,18 +36,18 @@
           {{ notification_number }}
         {% endif %}
       </span></a>     
-      <div class="w3-dropdown-content w3-white w3-card-4">
-        <a href="#">One new friend request</a>
-        <a href="#">John Doe posted on your wall</a>
-        <a href="#">Jane likes your post</a>
-      </div>
     </li>
   {% endif %}
-    <li class="w3-hide-small w3-right">
+    <li class="w3-hide-small w3-right w3-dropdown-hover">
   {% if user.is_authenticated %}
-    <a href="#" class="w3-padding-large w3-hover-white" title="My Account"><img src="{{ user.twotter_profile.avatar_url }}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
+    <a href="{{ request.host_name }}/twotter/{{ user.username }}/" class="w3-padding-large w3-hover-white" title="My Account"><img src="{{ user.twotter_profile.avatar_url }}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a> 
+    <div class="w3-dropdown-content w3-white w3-card-4" style="right: 0;">
+      <a href="{{ request.host_name }}/twotter/{{ user.username }}/">Profile</a>
+      <a href="{{ request.host_name }}/twotter/settings/">Settings</a>
+      <a href="{{ request.host_name }}/twotter/logout/">Logout</a>
+    </div>
   {% else %}
-    <a href="login/" class="w3-padding-large w3-hover-white">Sign In/Up</a>
+    <a href="{{ request.host_name }}/twotter/login/" class="w3-padding-large w3-hover-white">Sign In/Up</a>
   {% endif %}
     </li>
    </ul>

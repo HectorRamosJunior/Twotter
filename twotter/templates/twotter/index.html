@@ -61,7 +61,7 @@
             <div class="w3-container w3-padding">
               <h6 class="w3-opacity">What's happening?</h6>
               <p contenteditable="true" class="w3-border w3-padding" name="twoot" id="twoot_text">Enter 140 character twoot here!</p>
-              <button class="w3-btn w3-theme" name="button" value="make_twoot" id="twoot_button" disabled><i class="fa fa-pencil"></i>  Twoot!</button><span style="float:right;" id="twoot_character_count"></span>
+              <button class="w3-btn w3-theme" name="button" value="make_twoot" id="twoot_button" disabled><i class="fa fa-pencil"></i>  Twoot!</button><span id="twoot_character_count"></span>
             </div>
           </div>
         </div>
@@ -79,17 +79,19 @@
     {% endif %}
 
     <!--- Twoot Display Section -->
+    <div id="twoot_feed">
     {% for twoot in twoots %}
-      <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
-        <img src="{{ twoot.twotter_profile.avatar_url }}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px">
+      <div class="w3-container w3-card-2 w3-white w3-round w3-margin twoot_display"><br>
+        <a href="{{ request.host_name }}/twotter/{{ twoot.twotter_profile.user.username }}/"><img src="{{ twoot.twotter_profile.avatar_url }}" alt="Avatar" class="w3-left w3-circle w3-margin-right twotter_profile_link" style="width:60px"></a>
         <span class="w3-right w3-opacity">{{ twoot.creation_date }}</span>
-        <h4>{{ twoot.twotter_profile.display_name }}</h4><br>
+        <a href="{{ request.host_name }}/twotter/{{ twoot.twotter_profile.user.username }}/" class="twotter_profile_link"><h4>{{ twoot.twotter_profile.display_name }}</h4></a><br>
         <hr class="w3-clear">
         <p>{{ twoot.text }}</p>
         <button type="button" class="w3-btn w3-theme-d1 w3-margin-bottom"><i class="fa fa-heart"></i> Favorite</button> 
         <button type="button" class="w3-btn w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i>  Comment</button> 
       </div>
     {% endfor %}
+    </div>
       
     <!-- End Middle Column -->
     </div>
@@ -98,10 +100,9 @@
     <div class="w3-col m2">
       <div class="w3-card-2 w3-round w3-white w3-center">
         <div class="w3-container">
-          <p>Upcoming Events:</p>
-          <img src="img_forest.jpg" alt="Forest" style="width:100%;">
-          <p><strong>Holiday</strong></p>
-          <p>Friday 15:00</p>
+          <p>Upcoming Events Placeholder</p>
+          <p><strong>Given Holiday</strong></p>
+          <p>Given Date</p>
           <p><button class="w3-btn w3-btn-block w3-theme-l4">Info</button></p>
         </div>
       </div>
@@ -109,9 +110,8 @@
       
       <div class="w3-card-2 w3-round w3-white w3-center">
         <div class="w3-container">
-          <p>Friend Request</p>
-          <img src="img_avatar6.png" alt="Avatar" style="width:50%"><br>
-          <span>Jane Doe</span>
+          <p>Friend Request Placeholder</p><br>
+          <span>Said Person</span>
           <div class="w3-row w3-opacity">
             <div class="w3-half">
               <button class="w3-btn w3-green w3-btn-block w3-section" title="Accept"><i class="fa fa-check"></i></button>
@@ -125,7 +125,7 @@
       <br>
       
       <div class="w3-card-2 w3-round w3-white w3-padding-hor-16 w3-center">
-        <p>ADS</p>
+        <p>ADS Placeholder</p>
       </div>
       <br>
       
