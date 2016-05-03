@@ -26,6 +26,7 @@ def index(request):
 
     return render(request, 'twotter/index.html', context)
 
+
 def twotter_profile(request, username):
     twotter_profile = get_object_or_404(User, username=username).twotter_profile
     twoots = twotter_profile.twoots.all().order_by('-creation_date')
@@ -33,6 +34,7 @@ def twotter_profile(request, username):
     context = {'twotter_profile': twotter_profile, 'twoots': twoots}
 
     return render(request, 'twotter/profile.html', context)
+
 
 @login_required
 def profile_settings(request):
@@ -52,6 +54,7 @@ def profile_settings(request):
     context = {'twotter_profile': twotter_profile, 'settings_form': settings_form, 'saved': saved}
 
     return render(request, 'twotter/settings.html', context)
+
 
 @login_required
 def make_twoot(request):
@@ -144,11 +147,13 @@ def user_login_or_register(request):
 
             return render(request, 'twotter/login.html', context)
 
+
 @login_required
 def user_logout(request):
     logout(request)
 
     return redirect('twotter/')
+
 
 def redirect_to_index(request):
     return redirect('/twotter/')
@@ -169,7 +174,9 @@ def create_profile_for_user(username):
   # Handle if the user exists in the project but not in this app
   if user and not profile and username != "admin":
     profile = TwotterProfile()
+
     profile.user = User.objects.get(username=username)
     profile.display_name = username
+    profile.avatar_url = "http://i.imgur.com/3iMO8An.png"
 
     profile.save()
